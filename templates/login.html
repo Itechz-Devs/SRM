@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Log in — SRM{% endblock %}
+{% block content %}
+<div class="wrap narrow" style="padding-top: 90px;">
+  <div class="hero" style="text-align:center; max-width: 100%;">
+    <h1>Log in</h1>
+    <p>Welcome back.</p>
+  </div>
+
+  {% if error %}<div class="error">{{ error }}</div>{% endif %}
+
+  <form method="POST">
+    <label class="field-label" for="email">Email</label>
+    <input type="email" name="email" id="email" required placeholder="you@example.com">
+
+    <label class="field-label" for="password">Password</label>
+    <input type="password" name="password" id="password" required>
+
+    <button type="submit">Log in</button>
+  </form>
+
+  <div class="auth-links">No account yet? <a href="/register">Register</a></div>
+  <div class="auth-links">Or <a href="/guest">continue as guest</a> instead</div>
+</div>
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Verify your email — SRM{% endblock %}
+{% block content %}
+<div class="wrap narrow" style="padding-top: 90px;">
+  <div class="hero" style="text-align:center; max-width: 100%;">
+    <h1>Check your email</h1>
+    <p>We sent a 6-digit code to <strong>{{ email }}</strong>. Enter it below to finish creating your account.</p>
+  </div>
+
+  {% if error %}<div class="error">{{ error }}</div>{% endif %}
+
+  <form method="POST">
+    <label class="field-label" for="otp">Verification code</label>
+    <input type="text" name="otp" id="otp" required maxlength="6" placeholder="123456" autofocus>
+    <button type="submit">Verify and continue</button>
+  </form>
+
+  <form method="POST" action="/resend-otp" style="margin-top: 6px;">
+    <input type="hidden" name="email" value="{{ email }}">
+    <button type="submit" class="btn-secondary">Resend code</button>
+  </form>
+
+  <div class="notice">
+    Didn't get an email? If SMTP isn't configured yet, the code is printed in the terminal window running the app instead - check there.
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Your History — SRM{% endblock %}
+{% block content %}
+<div class="wrap">
+  <div class="hero">
+    <h1>Your enhancement history</h1>
+    <p>
+      {% if is_guest %}
+      Guest history only lasts for this browser session — it clears if you log out or your session expires. <a href="/register" style="color: var(--teal);">Create a free account</a> to keep it permanently.
+      {% else %}
+      Every image you've enhanced while signed in, most recent first.
+      {% endif %}
+    </p>
+  </div>
+
+  {% if not rows %}
+  <p class="empty">No enhancements yet. <a href="{{ url_for('enhance') }}" style="color: var(--teal);">Go enhance an image &rarr;</a></p>
+  {% else %}
+  {% for row in rows %}
+  <div class="history-item">
+    <div class="meta">
+      <strong>{{ row.original_name }}</strong> &middot; {{ row.timestamp }}
+    </div>
+    <div class="result-grid result-grid-3">
+      <figure>
+        <img src="{{ url_for('static', filename='uploads/' + row.original_filename) }}" alt="Original upload">
+        <figcaption>Your upload</figcaption>
+      </figure>
+      <figure>
+        <img src="{{ url_for('static', filename='uploads/' + row.input_filename) }}" alt="Model input">
+        <figcaption>What the model saw</figcaption>
+      </figure>
+      <figure>
+        <img src="{{ url_for('static', filename='uploads/' + row.output_filename) }}" alt="Enhanced output">
+        <figcaption>Enhanced output</figcaption>
+      </figure>
+    </div>
+    {% if not is_guest %}
+    <a class="btn" style="max-width: 260px; margin-top: 16px;" href="{{ url_for('download_result', filename=row.output_filename) }}">Download</a>
+    {% endif %}
+  </div>
+  {% endfor %}
+  {% endif %}
+</div>
+{% endblock %}
+{% block extra_head %}
+<style>
+  .result-grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+  @media (max-width: 900px) { .result-grid-3 { grid-template-columns: 1fr; } }
+</style>
+{% endblock %}

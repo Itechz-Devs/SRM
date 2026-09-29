@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}SRM{% endblock %}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0E1526;
+    --panel: #16213A;
+    --panel-2: #1C2B47;
+    --border: #263455;
+    --text: #E5E9F0;
+    --muted: #8291AA;
+    --teal: #2DD4BF;
+    --amber: #FBBF24;
+    --red: #F87171;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    line-height: 1.5;
+    overflow-x: hidden;
+  }
+  h1, h2, h3, .brand { font-family: 'Space Grotesk', sans-serif; }
+
+  #starfield { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background: var(--bg); }
+
+  nav {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 20px 40px; border-bottom: 1px solid var(--border);
+    position: relative; z-index: 2; flex-wrap: wrap; gap: 10px;
+  }
+  .brand { font-size: 18px; font-weight: 600; color: var(--text); text-decoration: none; }
+  .brand span { color: var(--teal); }
+  nav .nav-links { display: flex; align-items: center; }
+  nav a.nav-link {
+    color: var(--muted); text-decoration: none; font-size: 14px;
+    margin-left: 12px; padding: 8px 14px; border-radius: 6px;
+    transition: color 0.15s ease, background 0.15s ease;
+  }
+  nav a.nav-link:hover { color: var(--text); background: var(--panel-2); }
+  nav a.nav-link.active { color: var(--bg); background: var(--teal); }
+  nav .user-badge {
+    color: var(--muted); font-size: 13px; margin-left: 12px; padding: 8px 12px;
+    border: 1px solid var(--border); border-radius: 6px;
+  }
+  nav .user-badge.guest { color: var(--amber); border-color: var(--amber); }
+
+  .wrap { max-width: 1000px; margin: 0 auto; padding: 50px 24px 80px; position: relative; z-index: 2; }
+  .wrap.narrow { max-width: 440px; }
+
+  .hero { max-width: 600px; margin-bottom: 48px; }
+  .hero h1 { font-size: 34px; line-height: 1.2; margin: 0 0 12px; font-weight: 600; }
+  .hero p { color: var(--muted); font-size: 15px; margin: 0; }
+
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start; }
+  @media (max-width: 760px) { .grid { grid-template-columns: 1fr; } }
+
+  .card {
+    background: var(--panel); border: 1px solid var(--border); border-radius: 10px;
+    padding: 28px; margin-bottom: 32px;
+  }
+  .card h2 { font-size: 16px; margin: 0 0 6px; font-weight: 600; }
+  .card .sub { color: var(--muted); font-size: 13px; margin: 0 0 20px; }
+
+  label.field-label { display: block; font-size: 13px; color: var(--muted); margin: 16px 0 6px; }
+  label.field-label:first-of-type { margin-top: 0; }
+  input[type="email"], input[type="password"], input[type="text"], select {
+    width: 100%; padding: 11px 12px; background: var(--panel-2);
+    border: 1px solid var(--border); border-radius: 7px; color: var(--text);
+    font-family: 'Inter', sans-serif; font-size: 14px;
+  }
+  select:disabled { opacity: 0.45; cursor: not-allowed; }
+  input:focus, select:focus { outline: none; border-color: var(--teal); }
+
+  .dropzone {
+    border: 1.5px dashed var(--border); border-radius: 8px; padding: 40px 20px;
+    text-align: center; cursor: pointer; transition: border-color 0.15s ease, background 0.15s ease;
+  }
+  .dropzone.drag-over { border-color: var(--teal); background: rgba(45,212,191,0.06); }
+  .dropzone p { margin: 10px 0 0; color: var(--muted); font-size: 13px; }
+  .dropzone .filename { color: var(--teal); font-size: 13px; margin-top: 10px; word-break: break-all; }
+  input[type="file"] { display: none; }
+
+  .checkbox-row { display: flex; align-items: flex-start; gap: 8px; margin-top: 18px; font-size: 13px; color: var(--muted); }
+  .checkbox-row input { margin-top: 3px; }
+
+  button, .btn {
+    width: 100%; margin-top: 20px; padding: 12px; background: var(--teal); color: #08221E;
+    border: none; border-radius: 7px; font-family: 'Inter', sans-serif; font-weight: 600;
+    font-size: 14px; cursor: pointer; transition: opacity 0.15s ease; text-align: center;
+    text-decoration: none; display: block;
+  }
+  button:hover, .btn:hover { opacity: 0.9; }
+  button:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-secondary { background: var(--panel-2); color: var(--text); border: 1px solid var(--border); }
+
+  .preview-panel { min-height: 260px; display: flex; align-items: center; justify-content: center; }
+  .preview-panel img { max-width: 100%; border-radius: 6px; }
+  .preview-placeholder { color: var(--muted); font-size: 13px; text-align: center; }
+
+  .result-section { margin-top: 40px; }
+  .result-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media (max-width: 760px) { .result-grid { grid-template-columns: 1fr; } }
+  .result-grid figure { margin: 0; }
+  .result-grid img { width: 100%; border-radius: 8px; border: 1px solid var(--border); }
+  .result-grid figcaption { color: var(--muted); font-size: 13px; margin-top: 10px; }
+
+  .notice { border-left: 3px solid var(--amber); background: rgba(251,191,36,0.06); padding: 14px 16px; border-radius: 6px; font-size: 13px; color: var(--muted); margin-top: 24px; }
+  .error { border-left: 3px solid var(--red); background: rgba(248,113,113,0.08); padding: 14px 16px; border-radius: 6px; font-size: 13px; color: #FCA5A5; margin-bottom: 24px; }
+  .success { border-left: 3px solid var(--teal); background: rgba(45,212,191,0.08); padding: 14px 16px; border-radius: 6px; font-size: 13px; color: var(--teal); margin-bottom: 24px; }
+
+  .table-wrap table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: left; color: var(--muted); font-weight: 500; padding: 10px 12px; border-bottom: 1px solid var(--border); }
+  td { padding: 10px 12px; border-bottom: 1px solid var(--border); }
+  tr:last-child td { border-bottom: none; }
+  .empty { color: var(--muted); font-size: 13px; }
+
+  .sample-img { max-width: 100%; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 20px; display: block; }
+  .footnote { color: var(--muted); font-size: 12px; margin-top: 40px; border-top: 1px solid var(--border); padding-top: 20px; }
+
+  .auth-links { text-align: center; margin-top: 18px; font-size: 13px; color: var(--muted); }
+  .auth-links a { color: var(--teal); text-decoration: none; }
+
+  .history-item { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 20px; margin-bottom: 20px; }
+  .history-item .meta { color: var(--muted); font-size: 12px; margin-bottom: 14px; }
+  .history-item .meta strong { color: var(--text); }
+
+  .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.7s ease, transform 0.7s ease; }
+  .reveal.in-view { opacity: 1; transform: translateY(0); }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
+  }
+</style>
+{% block extra_head %}{% endblock %}
+</head>
+<body>
+
+<canvas id="starfield"></canvas>
+
+<nav>
+  <a class="brand" href="/">SRM<span>.</span></a>
+  <div class="nav-links">
+    {% if is_authenticated or is_guest %}
+      <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="/">Dashboard</a>
+      <a class="nav-link {% if request.path == '/enhance' %}active{% endif %}" href="/enhance">Enhance an Image</a>
+      <a class="nav-link {% if request.path == '/history' %}active{% endif %}" href="/history">History</a>
+      {% if is_guest %}
+        <span class="user-badge guest">Guest (downloads disabled)</span>
+      {% else %}
+        <span class="user-badge">{{ user_email }}</span>
+      {% endif %}
+      <a class="nav-link" href="/logout">Log out</a>
+    {% else %}
+      <a class="nav-link {% if request.path == '/login' %}active{% endif %}" href="/login">Log in</a>
+      <a class="nav-link {% if request.path == '/register' %}active{% endif %}" href="/register">Register</a>
+    {% endif %}
+  </div>
+</nav>
+
+{% block content %}{% endblock %}
+
+<script>
+  (function() {
+    const canvas = document.getElementById('starfield');
+    const ctx = canvas.getContext('2d');
+    let stars = [];
+    function resize() { canvas.width = window.innerWidth; canvas.height = document.documentElement.scrollHeight; }
+    function makeStars() {
+      const count = Math.floor((canvas.width * canvas.height) / 9000);
+      stars = Array.from({ length: count }, () => ({
+        x: Math.random() * canvas.width, y: Math.random() * canvas.height,
+        r: Math.random() * 1.3 + 0.2, phase: Math.random() * Math.PI * 2, speed: Math.random() * 0.02 + 0.005
+      }));
+    }
+    function draw(time) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (const s of stars) {
+        const twinkle = 0.5 + 0.5 * Math.sin(time * s.speed + s.phase);
+        ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(229, 233, 240, ${0.15 + twinkle * 0.5})`; ctx.fill();
+      }
+      requestAnimationFrame(draw);
+    }
+    window.addEventListener('resize', () => { resize(); makeStars(); });
+    resize(); makeStars(); requestAnimationFrame(draw);
+  })();
+
+  (function() {
+    const targets = document.querySelectorAll('.reveal');
+    if (!('IntersectionObserver' in window)) { targets.forEach(t => t.classList.add('in-view')); return; }
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add('in-view'); observer.unobserve(entry.target); } });
+    }, { threshold: 0.15 });
+    targets.forEach(t => observer.observe(t));
+  })();
+</script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

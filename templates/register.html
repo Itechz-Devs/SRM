@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Register — SRM{% endblock %}
+{% block content %}
+<div class="wrap narrow" style="padding-top: 90px;">
+  <div class="hero" style="text-align:center; max-width: 100%;">
+    <h1>Create an account</h1>
+    <p>We'll email you a 6-digit code to verify it's really you.</p>
+  </div>
+
+  {% if error %}<div class="error">{{ error }}</div>{% endif %}
+
+  <form method="POST">
+    <label class="field-label" for="email">Email</label>
+    <input type="email" name="email" id="email" required placeholder="you@example.com" value="{{ submitted_email or '' }}">
+
+    <label class="field-label" for="password">Password</label>
+    <input type="password" name="password" id="password" required minlength="6" placeholder="At least 6 characters">
+
+    <button type="submit">Send verification code</button>
+  </form>
+
+  <div class="auth-links">Already have an account? <a href="/login">Log in</a></div>
+  <div class="auth-links">Or <a href="/guest">continue as guest</a> instead</div>
+</div>
+{% endblock %}

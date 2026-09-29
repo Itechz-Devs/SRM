@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Welcome — SRM{% endblock %}
+{% block content %}
+<div class="wrap narrow" style="padding-top: 90px;">
+  <div class="hero" style="text-align:center; max-width: 100%;">
+    <h1>Welcome to SRM</h1>
+    <p>Create an account to save and download your enhanced images, or continue as a guest to try it out first.</p>
+  </div>
+
+  <a class="btn" href="/register">Create an account</a>
+  <a class="btn btn-secondary" href="/login">I already have an account</a>
+  <a class="btn btn-secondary" href="/guest">Continue as guest</a>
+
+  <div class="notice" style="margin-top: 28px;">
+    Guests can upload and enhance images, but can't download results. Create a free account (just an email and password) to unlock downloads.
+  </div>
+</div>
+{% endblock %}

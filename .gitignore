@@ -1,0 +1,45 @@
+# Virtual environments (huge, never commit these)
+venv/
+venv_gpu/
+
+# Downloaded/raw satellite data and processed training data (huge)
+data/raw/
+data/processed*/
+
+# Downloaded satellite tile folders (if these sit in your project root)
+maharashtra_sentinel2/
+mumbai_metro_sentinel2/
+maharashtra_infrared/
+maharashtra_sar/
+maharashtra_thermal/
+mumbai_infrared/
+mumbai_sar/
+mumbai_thermal/
+mumbai_esri_highres/
+india_sentinel2/
+
+# Trained models (large binary files) - force-add specific ones you need with:
+#   git add -f models/espcn_x4_best.keras
+models/*.keras
+models/*.h5
+
+# Evaluation results (regenerable by running evaluate.py) - force-add specific
+# sample images you want to keep with: git add -f results/sample_0.png
+results/*.png
+results/metrics.csv
+
+# Uploaded/enhanced images from the web app (regenerable)
+static/uploads/*.png
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Environment secrets (DB password, API keys, etc.)
+.env
+
+# OS/editor junk
+.DS_Store
+.vscode/
+.idea/

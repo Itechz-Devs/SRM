@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+{% block title %}Enhance an Image — SRM{% endblock %}
+{% block content %}
+<div class="wrap">
+  <div class="hero">
+    <h1>Upload an image to enhance</h1>
+    <p>Your image is passed through the trained super-resolution CNN, which reconstructs a sharpened, higher-detail version — the same model built for medium-resolution Sentinel-2 imagery. <a href="{{ url_for('history') }}" style="color: var(--teal);">View your past results &rarr;</a></p>
+  </div>
+
+  {% if not model_ready %}
+  <div class="error">No trained model found. Run <code>python src/train.py</code> first, then refresh this page.</div>
+  {% endif %}
+
+  {% if error %}
+  <div class="error">{{ error }}</div>
+  {% endif %}
+
+  {% if contributed %}
+  <div class="success">Thanks — your image was added to data/raw/EuroSAT_RGB/UserContributed/, ready to be included next time you run data_pipeline.py.</div>
+  {% endif %}
+
+  <form method="POST" enctype="multipart/form-data" id="enhanceForm">
+    <div class="grid">
+      <div class="card">
+        <h2>1. Choose an image</h2>
+        <p class="sub">Best results on satellite-style patches — crops, urban blocks, coastlines. Any JPG or PNG works.</p>
+
+        <label class="field-label" for="imagery_type">Imagery type</label>
+        <select name="imagery_type" id="imagery_type">
+          <option value="rgb">Standard (RGB) — active</option>
+          <option value="ir" disabled>Infrared (IR) — coming soon, no training data yet</option>
+          <option value="hyperspectral" disabled>Hyperspectral — coming soon, no training data yet</option>
+          <option value="sar" disabled>Radar / SAR — coming soon, no training data yet</option>
+          <option value="thermal" disabled>Thermal — coming soon, no training data yet</option>
+        </select>
+
+        <label class="dropzone" id="dropzone" style="margin-top:18px;">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#8291AA" stroke-width="1.5"><path d="M12 16V4M12 4l-4 4M12 4l4 4"/><path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>
+          <p>Drag an image here, or click to browse</p>
+          <div class="filename" id="filename"></div>
+          <input type="file" name="image" id="fileInput" accept="image/*" required>
+        </label>
+
+        <div class="checkbox-row">
+          <input type="checkbox" name="contribute" id="contribute" value="yes">
+          <label for="contribute">Contribute this image to the training dataset (helps improve future model versions)</label>
+        </div>
+
+        <button type="submit" id="submitBtn" {% if not model_ready %}disabled{% endif %}>Enhance image</button>
+      </div>
+
+      <div class="card">
+        <h2>2. Preview</h2>
+        <p class="sub">What you selected, before sending it to the model.</p>
+        <div class="preview-panel" id="previewPanel">
+          <div class="preview-placeholder">No image selected yet</div>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  {% if result %}
+  <div class="result-section">
+    <h2>Result</h2>
+    <div class="result-grid result-grid-3">
+      <figure>
+        <img src="{{ url_for('static', filename='uploads/' + result.original) }}" alt="Your original upload">
+        <figcaption>Your upload (cropped to a square, no blur applied)</figcaption>
+      </figure>
+      <figure>
+        <img src="{{ url_for('static', filename='uploads/' + result.input) }}" alt="Input">
+        <figcaption>What the model actually saw (degraded to match training)</figcaption>
+      </figure>
+      <figure>
+        <img src="{{ url_for('static', filename='uploads/' + result.output) }}" alt="Enhanced output">
+        <figcaption>Model output (enhanced)</figcaption>
+      </figure>
+    </div>
+
+    {% if is_guest %}
+    <div class="notice">
+      Downloading is available to registered accounts only. <a href="/register" style="color: var(--teal);">Create a free account</a> to download this result.
+    </div>
+    {% else %}
+    <a class="btn" style="max-width: 300px; margin-top: 20px;" href="{{ url_for('download_result', filename=result.output) }}">Download enhanced image</a>
+    {% endif %}
+
+    <div class="notice">
+      This model was trained on 64×64 satellite patches, so your image was cropped to a square and resized before processing — the middle panel shows exactly what the network received. There's no ground-truth reference for your own photo, so no PSNR/SSIM score is shown here; see the Dashboard for accuracy metrics measured against known test data.
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
+{% block extra_head %}
+<style>
+  .result-grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+  @media (max-width: 900px) { .result-grid-3 { grid-template-columns: 1fr; } }
+</style>
+{% endblock %}
+{% block scripts %}
+<script>
+  const dropzone = document.getElementById('dropzone');
+  const fileInput = document.getElementById('fileInput');
+  const filenameLabel = document.getElementById('filename');
+  const previewPanel = document.getElementById('previewPanel');
+
+  function showPreview(file) {
+    filenameLabel.textContent = file.name;
+    const reader = new FileReader();
+    reader.onload = (e) => { previewPanel.innerHTML = `<img src="${e.target.result}" alt="Preview">`; };
+    reader.readAsDataURL(file);
+  }
+
+  fileInput.addEventListener('change', () => { if (fileInput.files.length) showPreview(fileInput.files[0]); });
+  dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('drag-over'); });
+  dropzone.addEventListener('dragleave', () => dropzone.classList.remove('drag-over'));
+  dropzone.addEventListener('drop', (e) => {
+    e.preventDefault(); dropzone.classList.remove('drag-over');
+    if (e.dataTransfer.files.length) { fileInput.files = e.dataTransfer.files; showPreview(e.dataTransfer.files[0]); }
+  });
+</script>
+{% endblock %}
